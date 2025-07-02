@@ -27,6 +27,7 @@
 #include "Sensor/BMP3XXSensor.h"
 #include "Sensor/CGRadSensSensor.h"
 #include "Sensor/DFRobotLarkSensor.h"
+#include "Sensor/RS485WindSensor.h"
 #include "Sensor/LPS22HBSensor.h"
 #include "Sensor/MCP9808Sensor.h"
 #include "Sensor/MLX90632Sensor.h"
@@ -56,6 +57,7 @@ RCWL9620Sensor rcwl9620Sensor;
 AHT10Sensor aht10Sensor;
 MLX90632Sensor mlx90632Sensor;
 DFRobotLarkSensor dfRobotLarkSensor;
+RS485WindSensor rs485WindSensor;
 NAU7802Sensor nau7802Sensor;
 BMP3XXSensor bmp3xxSensor;
 #ifdef T1000X_SENSOR_EN
@@ -107,6 +109,8 @@ int32_t EnvironmentTelemetryModule::runOnce()
 #else
             if (dfRobotLarkSensor.hasSensor())
                 result = dfRobotLarkSensor.runOnce();
+            if (rs485WindSensor.hasSensor())
+                result = rs485WindSensor.runOnce();
             if (bmp085Sensor.hasSensor())
                 result = bmp085Sensor.runOnce();
             if (bmp280Sensor.hasSensor())
@@ -301,6 +305,10 @@ bool EnvironmentTelemetryModule::getEnvironmentTelemetry(meshtastic_Telemetry *m
 #else
     if (dfRobotLarkSensor.hasSensor()) {
         valid = valid && dfRobotLarkSensor.getMetrics(m);
+        hasSensor = true;
+    }
+    if (rs485WindSensor.hasSensor()) {
+        valid = valid && rs485WindSensor.getMetrics(m);
         hasSensor = true;
     }
     if (sht31Sensor.hasSensor()) {
@@ -501,6 +509,11 @@ AdminMessageHandleResult EnvironmentTelemetryModule::handleAdminMessageForModule
     AdminMessageHandleResult result = AdminMessageHandleResult::NOT_HANDLED;
     if (dfRobotLarkSensor.hasSensor()) {
         result = dfRobotLarkSensor.handleAdminMessage(mp, request, response);
+        if (result != AdminMessageHandleResult::NOT_HANDLED)
+            return result;
+    }
+    if (rs485WindSensor.hasSensor()) {
+        result = rs485WindSensor.handleAdminMessage(mp, request, response);
         if (result != AdminMessageHandleResult::NOT_HANDLED)
             return result;
     }
