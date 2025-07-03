@@ -8,3 +8,7 @@
 #include "main.h"
 
 #endif
+
+#if !MESHTASTIC_EXCLUDE_ENVIRONMENTAL_SENSOR
+void TelemetrySensor::setup() {}
+#endif
