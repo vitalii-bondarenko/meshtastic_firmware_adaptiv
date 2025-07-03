@@ -6,7 +6,6 @@
 #include "RS485WindSensor.h"
 #include "TelemetrySensor.h"
 
-// RS485 pin definitions for the wind sensor
 #define WIND_TX_PIN 45
 #define WIND_RX_PIN 46
 #define WIND_DE_RE_PIN 4
@@ -15,8 +14,8 @@
 
 static HardwareSerial windSerial(2);
 
-void RS485WindSensor::preTransmission() { digitalWrite(WIND_DE_RE_PIN, HIGH); }
-void RS485WindSensor::postTransmission() { digitalWrite(WIND_DE_RE_PIN, LOW); }
+static void RS485WindSensorPreTransmission() { digitalWrite(WIND_DE_RE_PIN, HIGH); }
+static void RS485WindSensorPostTransmission() { digitalWrite(WIND_DE_RE_PIN, LOW); }
 
 RS485WindSensor::RS485WindSensor()
     : TelemetrySensor(meshtastic_TelemetrySensorType_RS485_WIND, "RS485_WIND")
@@ -35,8 +34,9 @@ int32_t RS485WindSensor::runOnce()
     windSerial.begin(WIND_BAUD, SERIAL_8N1, WIND_RX_PIN, WIND_TX_PIN);
 
     node.begin(WIND_SLAVE_ID, windSerial);
-    node.preTransmission(RS485WindSensor::preTransmission);
-    node.postTransmission(RS485WindSensor::postTransmission);
+
+    node.preTransmission(RS485WindSensorPreTransmission);
+    node.postTransmission(RS485WindSensorPostTransmission);
     status = 1;
 
     return DEFAULT_SENSOR_MINIMUM_WAIT_TIME_BETWEEN_READS;
