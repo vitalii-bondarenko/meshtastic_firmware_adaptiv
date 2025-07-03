@@ -6,7 +6,6 @@
 #include "RS485WindSensor.h"
 #include "TelemetrySensor.h"
 
-// RS485 pin definitions
 #define WIND_TX_PIN 45
 #define WIND_RX_PIN 46
 #define WIND_DE_RE_PIN 4
@@ -35,6 +34,7 @@ int32_t RS485WindSensor::runOnce()
     windSerial.begin(WIND_BAUD, SERIAL_8N1, WIND_RX_PIN, WIND_TX_PIN);
 
     node.begin(WIND_SLAVE_ID, windSerial);
+
     node.preTransmission(RS485WindSensorPreTransmission);
     node.postTransmission(RS485WindSensorPostTransmission);
     status = 1;
